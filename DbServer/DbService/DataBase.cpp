@@ -107,7 +107,7 @@ namespace std {
 	{
 		std::lock_guard<std::mutex> lock_(mMutex);
 		for (auto& it : mDbConnections) {
-			if ( it->runAcquire()) {
+			if ( it->runAcquire() ) {
 				return it;
 			}
 		}

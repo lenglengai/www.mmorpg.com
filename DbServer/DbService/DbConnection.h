@@ -9,7 +9,19 @@ namespace std {
 		__i16 runQuery(const string& nQuery, D2SQueryPtr& nD2SQuery);
 		__i16 runPreCommand(__i32 nCommand, D2SPreCommandPtr& nD2SPreCommand);
 		__i16 runPreQuery(__i32 nQuery, D2SPreQueryPtr& nD2SPreQuery);
-	
+		
+		void runRecycle();
+		bool runAcquire();
+		
+		bool runConnect();
+		void runDisconnect();
+		
+	private:
+		__i16 runCommand(const string& nCommand, __i16& nAffectedRow);
+		void runActivate(bool nForce = false);
+		bool internalConnect();
+		void internalDisconnect();
+		
 	public:
 		explicit DbConnection(DataBase * nDataBase);
 		~DbConnection();
