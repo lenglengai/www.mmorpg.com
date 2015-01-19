@@ -41,24 +41,24 @@ namespace std {
 		return Error_::mSucess_;
 	}
 	
-	__i16 DataBase::runPreCommand(__i32 nCommand, D2SPreCommand * nD2SPreCommand)
+	__i16 DataBase::runPreCommand(S2DPreCommand * nS2DPreCommand, D2SPreCommand * nD2SPreCommand)
 	{
 		DbConnectionPtr& dbConnection_ = this->acquireConnection();
 		if (!dbConnection_) {
 			return DbError_::mAcquireConnetion_;
 		}
-		__i16 result_ = dbConnection_->runPreCommand(nCommand, nD2SPreCommand);
+		__i16 result_ = dbConnection_->runPreCommand(nS2DPreCommand, nD2SPreCommand);
 		this->recycleConnection(dbConnection_);
 		return result_;
 	}
 	
-	__i16 DataBase::runPreQuery(__i32 nQuery, D2SPreQuery * nD2SPreQuery)
+	__i16 DataBase::runPreQuery(S2DPreQuery * nS2DPreQuery, D2SPreQuery * nD2SPreQuery)
 	{
 		DbConnectionPtr& dbConnection_ = this->acquireConnection();
 		if (!dbConnection_) {
 			return DbError_::mAcquireConnetion_;
 		}
-		__i16 result_ = dbConnection_->runPreQuery(nQuery, nD2SPreQuery);
+		__i16 result_ = dbConnection_->runPreQuery(nS2DPreQuery, nD2SPreQuery);
 		this->recycleConnection(dbConnection_);
 		return result_;
 	}

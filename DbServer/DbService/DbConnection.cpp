@@ -59,13 +59,20 @@ namespace std {
 		dbResult_->runQuery(nD2SQuery);
 		return errorCode_;
 	}
-		
-	__i16 DbConnection::runPreCommand(__i32 nCommand, D2SPreCommand * nD2SPreCommand)
-	{
 	
+	__i16 DbConnection::runPreCommand(S2DPreCommand * nS2DPreCommand, D2SPreCommand * nD2SPreCommand)
+	{
+		__i16 command_ = nS2DPreCommand->getCommand();
+		auto it = mDbStatements.find(command_);
+		if ( it == mDbStatements.end() ) {
+			LogService& logService_ = Singleton<LogService>::instance();
+			logService_.logError(log_1(command_));
+			return DbError_::mNoStatement_;
+		}
+		const list<DbParam>& dbParams_ = nS2DPreCommand->getDbParams();
 	}
 	
-	__i16 DbConnection::runPreQuery(__i32 nQuery, D2SPreQuery * nD2SPreQuery)
+	__i16 DbConnection::runPreQuery(S2DPreQuery * nS2DPreQuery, D2SPreQuery * nD2SPreQuery)
 	{
 	}
 	

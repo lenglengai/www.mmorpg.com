@@ -11,6 +11,7 @@ namespace std {
 		~S2DPreQuery();
 		
 	private:
+		list<DbParam> mDbParams;
 		__i32 mCommand;
 		__i32 mCommandNo;
 	};

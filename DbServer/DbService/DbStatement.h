@@ -5,13 +5,11 @@ namespace std {
 	class DbStatement
 	{
 	public:
-		DbStatement();
+		DbStatement(MYSQL_STMT * nHandle);
 		~DbStatement();
 		
 	private:
         MYSQL_STMT * mHandle;
-        __i16 mParamCount;
-        vector<bool> mParamsSet;
         MYSQL_BIND * mParamBind;
 	};
 	

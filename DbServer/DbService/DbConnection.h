@@ -7,8 +7,8 @@ namespace std {
 	public:
 		__i16 runCommand(const string& nCommand, D2SCommand * nD2SCommand);
 		__i16 runQuery(const string& nQuery, D2SQuery * nD2SQuery);
-		__i16 runPreCommand(__i32 nCommand, D2SPreCommand * nD2SPreCommand);
-		__i16 runPreQuery(__i32 nQuery, D2SPreQuery * nD2SPreQuery);
+		__i16 runPreCommand(S2DPreCommand * nS2DPreCommand, D2SPreCommand * nD2SPreCommand);
+		__i16 runPreQuery(S2DPreQuery * nS2DPreQuery, D2SPreQuery * nD2SPreQuery);
 		
 		bool runAcquire(bool nInit = false);
 		void runRecycle();

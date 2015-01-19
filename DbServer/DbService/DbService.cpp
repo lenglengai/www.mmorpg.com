@@ -38,7 +38,7 @@ namespace std {
 		return dataBase_->registerStatement(nS2DStatement, nD2SStatement);
 	}
 	
-	__i16 DbService::runPreCommand(__i32 nDataBaseId, __i32 nCommand, D2SPreCommandPtr& nD2SPreCommand)
+	__i16 DbService::runPreCommand(__i32 nDataBaseId, S2DPreCommand * nS2DPreCommand, D2SPreCommandPtr& nD2SPreCommand)
 	{
 		auto it = mDataBases.find(nDataBaseId);
 		if ( it == mDataBases.end() ) {
@@ -47,10 +47,10 @@ namespace std {
 			return DbError_::mNoFindDb_;
 		}
 		DataBasePtr& dataBase_ = it->second;
-		return dataBase_->runPreCommand(nCommand, nD2SPreCommand);
+		return dataBase_->runPreCommand(nS2DPreCommand, nD2SPreCommand);
 	}
 	
-	__i16 DbService::runPreQuery(__i32 nDataBaseId, __i32 nQuery, D2SPreQueryPtr& nD2SPreQuery)
+	__i16 DbService::runPreQuery(__i32 nDataBaseId, S2DPreQuery * nS2DPreQuery, D2SPreQueryPtr& nD2SPreQuery)
 	{
 		auto it = mDataBases.find(nDataBaseId);
 		if ( it == mDataBases.end() ) {
@@ -59,7 +59,7 @@ namespace std {
 			return DbError_::mNoFindDb_;
 		}
 		DataBasePtr& dataBase_ = it->second;
-		return dataBase_->runPreQuery(nQuery, nD2SPreQuery);
+		return dataBase_->runPreQuery(nS2DPreQuery, nD2SPreQuery);
 	}
 	
 	bool DbService::runPreinit()
