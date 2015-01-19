@@ -64,6 +64,7 @@ namespace std {
 	
 	bool DbService::runPreinit()
 	{
+		mysql_library_init();
 		this->runClear();
 	}
 	
@@ -74,6 +75,7 @@ namespace std {
 			DataBasePtr& dataBase_ = it->second;
 			dataBase_->runClose();
 		}
+		mysql_library_end();
 	}
 	
 	void DbService::runClear()

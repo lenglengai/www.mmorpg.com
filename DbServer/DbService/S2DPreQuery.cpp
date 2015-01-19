@@ -2,18 +2,18 @@
 
 namespace std {
 	
-	__i16 S2DPreCommand::handleRun(SessionPtr& nSession)
+	__i16 S2DPtrQuery::handleRun(SessionPtr& nSession)
 	{
 		return DbError_::mSucess_;
 	}
 	
-	S2DPreCommand::S2DPreCommand()
+	S2DPtrQuery::S2DPtrQuery()
 		: mCommandNo (0)
 		, mCommand (0)
 	{
 	}
 	
-	S2DPreCommand::~S2DPreCommand()
+	S2DPtrQuery::~S2DPtrQuery()
 	{
 		mCommandNo = 0;
 		mCommand = 0;

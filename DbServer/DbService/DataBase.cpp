@@ -2,12 +2,10 @@
 
 namespace std {
 	
-	__i16 DataBase::runCommand(const string& nCommand, D2SCommandPtr& nD2SCommand)
+	__i16 DataBase::runCommand(const string& nCommand, D2SCommand * nD2SCommand)
 	{
 		DbConnectionPtr& dbConnection_ = this->acquireConnection();
 		if (!dbConnection_) {
-			LogService& logService_ = Singleton<LogService>::instance();
-			logService_.logError(log_1("!dbConnection_"));
 			return DbError_::mAcquireConnetion_;
 		}
 		__i16 result_ = dbConnection_->runCommand(nCommand, nD2SCommand);
@@ -15,12 +13,10 @@ namespace std {
 		return result_;
 	}
 	
-	__i16 DataBase::runQuery(const string& nQuery, D2SQueryPtr& nD2SQuery)
+	__i16 DataBase::runQuery(const string& nQuery, D2SQuery * nD2SQuery)
 	{
 		DbConnectionPtr& dbConnection_ = this->acquireConnection();
 		if (!dbConnection_) {
-			LogService& logService_ = Singleton<LogService>::instance();
-			logService_.logError(log_1("!dbConnection_"));
 			return DbError_::mAcquireConnetion_;
 		}
 		__i16 result_ = dbConnection_->runQuery(nQuery, nD2SQuery);
@@ -28,14 +24,14 @@ namespace std {
 		return result_;
 	}
 	
-	__i16 DataBase::registerStatement(S2DStatementPtr& nS2DStatement, D2SStatementPtr& nD2SStatement)
+	__i16 DataBase::registerStatement(S2DStatementPtr& nS2DStatement, D2SStatement * nD2SStatement)
 	{
 		map<__i32, string>& preCommands_ = nS2DStatement->getPreCommand();
 		for ( auto& it : preCommands_ ) {
 			auto it0 = mPreCommands->find(it.first);
 			if ( it0 != mPreCommands.end() ) {
-				nD2SStatement->setErrorCode(Error_::mRepeat_);
-				return Error_::mSucess_;
+				nD2SStatement->setErrorCode(DbError_::mRepeat_);
+				return DbError_::mSucess_;
 			}
 		}
 		for ( auto& it : preCommands_ ) {
@@ -45,12 +41,10 @@ namespace std {
 		return Error_::mSucess_;
 	}
 	
-	__i16 DataBase::runPreCommand(__i32 nCommand, D2SPreCommandPtr& nD2SPreCommand)
+	__i16 DataBase::runPreCommand(__i32 nCommand, D2SPreCommand * nD2SPreCommand)
 	{
 		DbConnectionPtr& dbConnection_ = this->acquireConnection();
 		if (!dbConnection_) {
-			LogService& logService_ = Singleton<LogService>::instance();
-			logService_.logError(log_1("!dbConnection_"));
 			return DbError_::mAcquireConnetion_;
 		}
 		__i16 result_ = dbConnection_->runPreCommand(nCommand, nD2SPreCommand);
@@ -58,17 +52,20 @@ namespace std {
 		return result_;
 	}
 	
-	__i16 DataBase::runPreQuery(__i32 nQuery, D2SPreQueryPtr& nD2SPreQuery)
+	__i16 DataBase::runPreQuery(__i32 nQuery, D2SPreQuery * nD2SPreQuery)
 	{
 		DbConnectionPtr& dbConnection_ = this->acquireConnection();
 		if (!dbConnection_) {
-			LogService& logService_ = Singleton<LogService>::instance();
-			logService_.logError(log_1("!dbConnection_"));
 			return DbError_::mAcquireConnetion_;
 		}
 		__i16 result_ = dbConnection_->runPreQuery(nQuery, nD2SPreQuery);
 		this->recycleConnection(dbConnection_);
 		return result_;
+	}
+	
+	const map<__i32, string>& DataBase::getPreCommands() const
+	{
+		return mPreCommands;
 	}
 	
 	void DataBase::runStop()
@@ -118,7 +115,7 @@ namespace std {
 			return __defaultptr<DbConnection>();
 		}
 		DbConnectionPtr dbConnection_(new DbConnection(this));
-		dbConnection_->runAcquire();
+		dbConnection_->runAcquire(true);
 		mDbConnections.push_back(dbConnection_);
 		return mDbConnections.back();
 	}

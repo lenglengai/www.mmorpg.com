@@ -2,35 +2,20 @@
 
 namespace std {
 	
-	class D2SCommand
+	class D2SPreCommand
 	{
 	public:
-	#ifdef __DBCLIENT__
-		__i16 handleRun(SessionPtr& nSession);
-	#endif
-	#ifdef __DBSERVER__
 		void setErrorCode(__i8 nErrorCode);
-		void setAffectedRow(__i16 nAffectedRow);
-	#endif
-	#ifdef __DBCLIENT__
-		__i32 getCommandNo();
-		__i8 getErrorCode();
-		__i16 getAffectedRow();
-	#endif
+		void setRowCount(__i16 nRowCount);
 		
-	#ifdef __DBCLIENT__
-		D2SCommand();
-	#endif
-	#ifdef __DBSERVER__
-		D2SCommand(__i32 nCommandNo);
-	#endif
-		~D2SCommand();
+		D2SPreCommand(__i32 nCommandNo);
+		~D2SPreCommand();
 		
 	private:
 		__i32 mCommandNo;
 		__i8 mErrorCode;
-		__i16 mAffectedRow;
+		__i16 mRowCount;
 	};
-	typedef shared_ptr<D2SCommand> D2SCommandPtr;
+	typedef shared_ptr<D2SPreCommand> D2SCommandPtr;
 	
 }

@@ -1,41 +1,105 @@
 
 namespace std {
 	
-	__i16 DbResult::runQuery(D2SQueryPtr& nD2SQuery)
+	__i16 DbResult::runQuery(D2SQuery * nD2SQuery)
 	{
-		mResult = mysql_store_result(&mHandle);
-		if (nullptr == mResult) {
-			if ( 0 != mysql_errno(&mHandle) ) {
-				LogService& logService_ = Singleton<LogService>::instance();
-				logService_.logError(log_1(mysql_error(&mHandle)));
-				return Error_::mDbError_;
+		unsigned long * length_ = nullptr;
+		__i16 errorCode_ = Error_::mSucess_;
+		MYSQL_ROW rowResult_ = mysql_fetch_row(mHandle);
+		while ( nullptr != rowResult_ ) {
+			length_ = mysql_fetch_lengths(mHandle));
+			if (nullptr == length_) break;
+			for (__i16 i = 0; i < _fieldCount; i++) {
+				switch (mFieldResult[i].type) {
+					case MYSQL_TYPE_TINY:
+						{
+							errorCode_ = nD2SQuery->runInt8(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_SHORT:
+						{
+							errorCode_ = nD2SQuery->runInt16(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_LONG:
+						{
+							errorCode_ = nD2SQuery->runInt32(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_LONGLONG:
+						{
+							errorCode_ = nD2SQuery->runInt64(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_FLOAT:
+						{
+							errorCode_ = nD2SQuery->runFloat(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_DOUBLE:
+						{
+							errorCode_ = nD2SQuery->runDouble(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_STRING:
+					case MYSQL_TYPE_VAR_STRING:
+						{
+							errorCode_ = nD2SQuery->runString(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					case MYSQL_TYPE_TINY_BLOB:
+					case MYSQL_TYPE_MEDIUM_BLOB:
+					case MYSQL_TYPE_LONG_BLOB:
+					case MYSQL_TYPE_BLOB:
+						{
+							errorCode_ = nD2SQuery->runBlob(rowResult_[i], length_[i]);
+							if (Error_::mSucess_ != errorCode_) {
+								return errorCode_;
+							}
+						}
+						break;
+					default:
+						return DbError_::mNoField_;
+				}
 			}
-			LogService& logService_ = Singleton<LogService>::instance();
-			logService_.logError(log_1("mysql_store_result"));
-			return Error_::mDbError_;
-		}
-		int rowCounts_ = mysql_num_rows(mResult);
-		if ( rowCounts_ <= 0 ) {
-			return Error_::mSucess_;
-		}
-		int fieldCounts_ = mysql_num_fields(mResult);
-		mRowResult = mysql_fetch_row(mResult);
-		mLengths = mysql_fetch_lengths(mMYSQL_RES));
-		while ( nullptr != mRowResult ) {
 		}
 		return Error_::mSucess_;
 	}
-	
-	DbResult::DbResult(MYSQL& nHandle)
+		
+	DbResult::DbResult(MYSQL_RES * nHandle, __i16 nRowCount,
+		MYSQL_FIELD * nFieldResult, __i16 nFieldCount)
 		: mHandle (nHandle)
-		, mResult (nullptr)
+		, mRowCount (nRowCount)
+		, mFieldResult (nFieldResult)
+		, mFieldCount (nFieldCount)
 	{
 	}
 	
-	MySqlQuery::~MySqlQuery()
+	DbResult::~DbResult()
 	{
-		if (nullptr != mResult) {
-			mysql_free_result(mResult);
+		if (nullptr != mHandle) {
+			mysql_free_result(mHandle);
 		}
 	}
 	
