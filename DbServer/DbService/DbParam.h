@@ -14,8 +14,12 @@ namespace std {
 		static const __i8 mFloat_ = 6;
 		static const __i8 mDouble_ = 7;
 		static const __i8 mString_ = 8;
-		static const __i8 mBinary_ = 9;
-		static const __i8 mEnd_ = 10;
+		static const __i8 mVarString_ = 9;
+		static const __i8 mTinyBlob_ = 10;
+		static const __i8 mBlob_ = 11;
+		static const __i8 mBigBlob_ = 12;
+		static const __i8 mMaxBlob_ = 13;
+		static const __i8 mEnd_ = 14;
 	};
 	
 	union DbValue
@@ -32,6 +36,12 @@ namespace std {
 	class DbParam : noncopyable
 	{
 	public:
+		
+		__i8 getDbType() const;
+		void * getDbValue() const;
+		__i16 getLength() const;
+		char * getValue() const;
+		
 		DbParam();
 		~DbParam();
 		

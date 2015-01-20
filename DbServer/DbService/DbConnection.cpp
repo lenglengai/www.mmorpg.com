@@ -60,7 +60,7 @@ namespace std {
 		return errorCode_;
 	}
 	
-	__i16 DbConnection::runPreCommand(S2DPreCommand * nS2DPreCommand, D2SPreCommand * nD2SPreCommand)
+	__i16 DbConnection::runPreCommand(S2DPreCommand * nS2DPreCommand)
 	{
 		__i16 command_ = nS2DPreCommand->getCommand();
 		auto it = mDbStatements.find(command_);
@@ -69,7 +69,57 @@ namespace std {
 			logService_.logError(log_1(command_));
 			return DbError_::mNoStatement_;
 		}
+		DbStatementPtr& dbStatement_ = it->second; __i32 count_ = 0;
 		const list<DbParam>& dbParams_ = nS2DPreCommand->getDbParams();
+		for ( auto& it0 : dbParams_ ) {
+			if ( !dbStatement_->pushParam(count_, it0) ) {
+				return DbError_::mPushParam_;
+			}
+		}
+		int errorCode_ = 0, errorNo_ = 0;
+        MYSQL_STMT* msql_STMT_ = dbStatement_->getHandle();
+        MYSQL_BIND* msql_BIND_ = dbStatement_->getParamBind();
+		for (int i = 0; i < 2; ++i) {
+			errorCode_ = mysql_stmt_bind_param(msql_STMT_, msql_BIND_);
+			if (0 == errorCode_) {
+				errorCode_ = mysql_stmt_execute(msql_STMT_);
+				if (0 == errorCode_) break;
+				if ( i > 0 ) {
+					LogService& logService_ = Singleton<LogService>::instance();
+					logService_.logError(log_1(mysql_error(&mHandle)));
+					return DbError_::mPreCommand_;
+				}
+				errorNo_ = mysql_errno(&mHandle);
+				if ( (CR_SERVER_GONE_ERROR == errorNo_)
+					|| (CR_SERVER_LOST == errorNo_) ) {
+					this->runActivate(true);
+					continue;
+				}
+			} else {
+				if ( i > 0 ) {
+					LogService& logService_ = Singleton<LogService>::instance();
+					logService_.logError(log_1(mysql_error(&mHandle)));
+					return DbError_::mPreCommand_;
+				}
+				errorNo_ = mysql_errno(&mHandle);
+				if ( (CR_SERVER_GONE_ERROR == errorNo_)
+					|| (CR_SERVER_LOST == errorNo_) ) {
+					this->runActivate(true);
+					continue;
+				}
+			}
+		}
+		return DbError_::mSucess_;
+	}
+		
+	__i16 DbConnection::runPreCommand(S2DPreCommand * nS2DPreCommand, D2SPreCommand * nD2SPreCommand)
+	{
+		__i16 errorCode_ = this->runPreCommand(nS2DPreCommand);
+		if ( DbError_::mSucess_ != errorCode_ ) {
+			nD2SPreCommand->setErrorCode(errorCode_);
+			return errorCode_;
+		}
+		
 	}
 	
 	__i16 DbConnection::runPreQuery(S2DPreQuery * nS2DPreQuery, D2SPreQuery * nD2SPreQuery)

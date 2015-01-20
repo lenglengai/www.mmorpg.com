@@ -18,6 +18,7 @@ namespace std {
 		
 	private:
 		__i16 runCommand(const char * nCommand, __i16 nLength);
+		__i16 runPreCommand(S2DPreCommand * nS2DPreCommand);
 		void runActivate(bool nForce = false);
 		bool internalConnect();
 		void internalDisconnect();
